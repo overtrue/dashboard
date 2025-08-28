@@ -1,0 +1,180 @@
+# AI功能实现规范 - 使用Vercel AI SDK
+
+## 核心原则
+
+所有AI相关功能必须使用 [Vercel AI SDK](https://ai-sdk.dev/) 实现，这是项目的标准AI解决方案。
+
+## 必须遵循的规则
+
+### 1. 依赖安装
+```bash
+npm i ai
+```
+
+### 2. 导入规范
+```typescript
+import { openai } from 'ai/openai';
+import { anthropic } from 'ai/anthropic';
+import { streamText } from 'ai';
+import { generateObject } from 'ai';
+import { useChat, useCompletion } from 'ai/react';
+```
+
+### 3. 组件实现规范
+
+#### 聊天组件必须使用 useChat hook
+```typescript
+import { useChat } from 'ai/react';
+
+export function AIChatComponent() {
+  const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
+    api: '/api/chat',
+    initialMessages: [
+      {
+        id: '1',
+        role: 'assistant',
+        content: '你好！我是你的AI助手，有什么可以帮助你的吗？'
+      }
+    ]
+  });
+
+  return (
+    // 组件实现
+  );
+}
+```
+
+#### 流式响应处理
+```typescript
+// 服务端API实现
+import { streamText } from 'ai';
+import { openai } from 'ai/openai';
+
+export async function POST(req: Request) {
+  const { messages } = await req.json();
+
+  const result = await streamText({
+    model: openai('gpt-4'),
+    messages,
+  });
+
+  return result.toDataStreamResponse();
+}
+```
+
+### 4. 禁止使用的模式
+
+❌ **禁止直接使用以下库**：
+- `openai` (直接包)
+- `@anthropic-ai/sdk`
+- `@google/generative-ai`
+- 其他AI服务商的直接SDK
+
+❌ **禁止直接调用AI API**：
+- 直接HTTP请求到AI服务
+- 手动实现流式响应
+- 自定义AI客户端
+
+### 5. 推荐实现模式
+
+#### 统一提供者API
+```typescript
+// 支持多AI提供者切换
+import { openai } from 'ai/openai';
+import { anthropic } from 'ai/anthropic';
+
+const model = process.env.AI_PROVIDER === 'claude'
+  ? anthropic('claude-3-sonnet-20240229')
+  : openai('gpt-4');
+```
+
+#### 生成结构化数据
+```typescript
+import { generateObject } from 'ai';
+
+const result = await generateObject({
+  model: openai('gpt-4'),
+  prompt: '分析用户反馈并返回结构化数据',
+  schema: z.object({
+    sentiment: z.enum(['positive', 'negative', 'neutral']),
+    category: z.string(),
+    priority: z.number().min(1).max(5)
+  })
+});
+```
+
+### 6. 文件结构规范
+
+AI相关文件必须按以下结构组织：
+```
+app/
+├── api/
+│   ├── chat/
+│   │   └── route.ts          # 聊天API
+│   ├── completion/
+│   │   └── route.ts          # 补全API
+│   └── generate/
+│       └── route.ts          # 生成API
+├── components/
+│   ├── ai/
+│   │   ├── chat-interface.tsx
+│   │   ├── completion-form.tsx
+│   │   └── generation-panel.tsx
+│   └── ui/
+└── lib/
+    └── ai-config.ts          # AI配置
+```
+
+### 7. 错误处理规范
+
+```typescript
+import { generateText } from 'ai';
+
+try {
+  const result = await generateText({
+    model: openai('gpt-4'),
+    prompt: '用户输入',
+  });
+} catch (error) {
+  // 使用AI SDK的标准错误处理
+  if (error instanceof Error) {
+    console.error('AI生成错误:', error.message);
+  }
+}
+```
+
+### 8. 环境变量配置
+
+```env
+# AI提供者选择
+AI_PROVIDER=openai
+OPENAI_API_KEY=your_key_here
+
+# 或
+AI_PROVIDER=anthropic
+ANTHROPIC_API_KEY=your_key_here
+```
+
+## 实施检查清单
+
+- [ ] 已安装 `ai` 包
+- [ ] 使用 `useChat` 或 `useCompletion` hooks
+- [ ] 实现流式响应处理
+- [ ] 配置正确的AI提供者
+- [ ] 错误处理使用AI SDK标准方式
+- [ ] 遵循文件结构规范
+
+## 参考资源
+
+- [AI SDK官方文档](https://ai-sdk.dev/)
+- [AI SDK Cookbook](https://ai-sdk.dev/docs/cookbook)
+- [AI SDK Playground](https://ai-sdk.dev/playground)
+- [AI SDK GitHub](https://github.com/vercel/ai)
+
+## 违反规则的后果
+
+任何违反此规则的代码将被拒绝合并，必须重构为使用Vercel AI SDK的实现。
+description:
+globs:
+alwaysApply: true
+---

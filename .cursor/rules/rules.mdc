@@ -1,0 +1,392 @@
+# AI Dashboard Generator - Cursor Rules
+
+## 项目概述
+
+这是一个基于 AI 驱动的动态管理后台应用项目，通过数据库存储的 JSON 协议动态渲染界面。项目包含前端界面、后端API服务和AI服务，采用现代化的技术栈，使用 OriginUI 作为 UI 组件库，参考 Crafted 面板布局设计。
+
+## 核心架构理念
+
+这不是一个传统的代码生成器，而是一个 **AI 驱动的动态管理后台应用**：
+
+- **实时 AI 交互**：所有界面和交互都通过 AI + 基本 UI 交互实时生成
+- **协议驱动渲染**：界面信息以 JSON 协议存储到数据库，动态渲染
+- **数据库驱动**：左侧菜单、页面结构、视图、工作流都按协议存储在数据库表中
+- **动态展示**：根据协议约定动态渲染所有组件和布局
+
+## 技术栈要求（全部使用最新版）
+
+- **Frontend**: React 19+, TypeScript 5+, Tailwind CSS v4+, Next.js App Router
+- **UI Library**: OriginUI（基于 shadcn/ui）、Radix UI（最新版）、Framer Motion（最新版）
+- **Backend**: Node.js（最新版）/Express（最新版），PostgreSQL/MySQL（最新版）
+- **AI Integration**: Vercel AI SDK（最新版）
+- **Build Tools**: Next.js（最新版）、ESLint、Prettier
+- **Testing**: Vitest、React Testing Library（最新版）
+
+## 开发哲学
+
+### 核心信念
+
+- **Incremental progress over big bangs** - 小的、可编译和通过测试的变更
+- **Learning from existing code** - 在实现前学习和规划
+- **Pragmatic over dogmatic** - 适应项目现实
+- **Clear intent over clever code** - 保持简单明了
+
+### 简单性意味着
+
+- 每个函数/类单一职责
+- 避免过早抽象
+- 没有巧妙技巧 - 选择简单的解决方案
+- 如果需要解释，说明太复杂了
+
+## 架构设计原则
+
+### 1. 前端架构（Next.js App Router）
+
+- **分组路由**：使用 `(groupName)` 模式组织不同功能模块
+- **布局嵌套**：每个路由组都有自己的 layout.tsx
+- **组件分层**：UI 组件 → 功能组件 → 页面组件 → 布局组件
+- **Context 管理**：全局状态通过 React Context 管理
+
+### 2. 后端架构（Express/Node.js）
+
+- **路由分组**：按功能模块组织 API 路由
+- **分层架构**：Route → Controller → Service → Model
+- **中间件系统**：认证、日志、错误处理等
+- **数据库抽象**：统一的数据访问层
+- **AI 集成**：内置 AI 服务处理协议生成和优化
+
+### 3. 数据库设计
+
+- **协议存储**：JSON 格式存储界面协议
+- **版本控制**：支持协议版本管理和回滚
+- **用户管理**：权限和角色控制
+- **日志记录**：操作审计和性能监控
+
+## 代码风格规范
+
+### 文件命名约定
+
+- 组件文件: `kebab-case.tsx` (如 `data-table.tsx`, `app-sidebar.tsx`)
+- UI 组件: `kebab-case.tsx` (如 `card.tsx`, `button.tsx`)
+- 工具函数: `kebab-case.ts` (如 `format-data.ts`, `get-config.ts`)
+- 常量文件: `kebab-case.ts` (如 `api-endpoints.ts`)
+- 类型定义: `types.ts` 或 `[feature].types.ts`
+- Hook 文件: `use-[name].ts` (如 `use-sidebar.ts`)
+
+### 组件开发模式
+
+1. **组合优于继承**: 使用多个小组件组合成复杂组件
+2. **data-slot 属性**: 每个组件使用 `data-slot` 标识
+3. **forwardRef 模式**: 所有基础组件支持 ref 传递
+4. **Polymorphic 组件**: 支持 `asChild` 属性改变渲染元素
+
+### 必须包含的核心工具函数
+
+```typescript
+// lib/utils.ts
+import { clsx, type ClassValue } from "clsx"
+import { twMerge } from "tailwind-merge"
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
+```
+
+## 动态协议系统
+
+### 协议类型定义
+
+```typescript
+// 菜单协议
+interface MenuProtocol {
+  id: string
+  title: string
+  icon: string
+  path: string
+  type: 'page' | 'group' | 'external'
+  children?: MenuProtocol[]
+  permissions?: string[]
+  metadata?: Record<string, any>
+}
+
+// 页面协议
+interface PageProtocol {
+  id: string
+  title: string
+  type: 'dashboard' | 'table' | 'form' | 'chart' | 'custom'
+  layout: LayoutProtocol
+  components: ComponentProtocol[]
+  workflows?: WorkflowProtocol[]
+  metadata?: Record<string, any>
+}
+
+// 组件协议
+interface ComponentProtocol {
+  id: string
+  type: string
+  props: Record<string, any>
+  children?: ComponentProtocol[]
+  events?: EventProtocol[]
+  validation?: ValidationProtocol[]
+}
+```
+
+### 动态组件渲染器模板
+
+```typescript
+// 动态组件渲染器模板
+import * as React from "react"
+import { cn } from "@/lib/utils"
+import type { ComponentProtocol } from "@/types/protocols"
+
+interface DynamicComponentProps {
+  protocol: ComponentProtocol
+  className?: string
+}
+
+function DynamicComponent({
+  protocol,
+  className,
+  ...props
+}: DynamicComponentProps & React.ComponentProps<"div">) {
+  const Component = getComponentByType(protocol.type)
+
+  if (!Component) {
+    console.warn(`Unknown component type: ${protocol.type}`)
+    return null
+  }
+
+  return (
+    <Component
+      {...protocol.props}
+      className={cn(protocol.props.className, className)}
+      data-protocol-id={protocol.id}
+      {...props}
+    >
+      {protocol.children?.map((child) => (
+        <DynamicComponent
+          key={child.id}
+          protocol={child}
+        />
+      ))}
+    </Component>
+  )
+}
+```
+
+## OriginUI 组件集成
+
+### 使用 OriginUI 组件（shadcn 模式）
+
+```bash
+# OriginUI 基于 shadcn 模式，按组件单独添加
+# 例如添加导航组件
+npx shadcn add https://originui.com/r/comp-577.json
+
+# 添加其他 OriginUI 组件
+npx shadcn add https://originui.com/r/comp-[id].json
+
+# 参考 Crafted 面板布局实验
+npx shadcn add https://ui-experiments-green.vercel.app/r/experiment-01.json
+```
+
+### 组件使用规范
+
+```typescript
+// 使用通过 shadcn 添加的 OriginUI 组件
+import { NavigationMenu } from "@/components/ui/navigation-menu"
+import { Card, CardHeader, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+
+// 保持 shadcn 风格的组件定义
+function CustomCard({ className, ...props }: React.ComponentProps<"div">) {
+  return (
+    <div
+      data-slot="custom-card"
+      className={cn("bg-card text-card-foreground rounded-xl border shadow-sm", className)}
+      {...props}
+    />
+  )
+}
+```
+
+## 开发流程
+
+### 1. 规划和分阶段
+
+将复杂工作分解为 3-5 个阶段。在 `IMPLEMENTATION_PLAN.md` 中记录：
+
+```markdown
+## Stage N: [Name]
+**Goal**: [Specific deliverable]
+**Success Criteria**: [Testable outcomes]
+**Tests**: [Specific test cases]
+**Status**: [Not Started|In Progress|Complete]
+```
+
+### 2. 实现流程
+
+1. **理解** - 研究代码库中的现有模式
+2. **测试** - 先写测试（红色）
+3. **实现** - 最小代码通过测试（绿色）
+4. **重构** - 清理代码，保持测试通过
+5. **提交** - 清晰的消息链接到计划
+
+### 3. 遇到问题时（3次尝试后）
+
+**关键**：每个问题最多3次尝试，然后停止。
+
+1. **记录失败原因**：
+   - 尝试了什么
+   - 具体错误消息
+   - 认为失败的原因
+
+2. **研究替代方案**：
+   - 找到2-3个类似实现
+   - 注意使用的不同方法
+
+3. **质疑基础**：
+   - 这是正确的抽象级别吗？
+   - 可以分解为更小的问题吗？
+   - 有更简单的方法吗？
+
+## 代码质量要求
+
+### 每个提交必须
+
+- 成功编译
+- 通过所有现有测试
+- 包含新功能的测试
+- 遵循项目格式/检查
+
+### 提交前
+
+- 运行格式化工具/检查器
+- 自我审查变更
+- 确保提交消息解释"为什么"
+
+### 错误处理
+
+- 快速失败并提供描述性消息
+- 包含调试上下文
+- 在适当级别处理错误
+- 永远不要静默吞下异常
+
+## 测试规范
+
+### 组件测试模板
+
+```typescript
+// 组件测试模板
+import { render, screen } from "@testing-library/react"
+import userEvent from "@testing-library/user-event"
+import { describe, it, expect, vi } from "vitest"
+
+import { Button } from "@/components/ui/button"
+
+describe("Button", () => {
+  it("renders correctly", () => {
+    render(<Button>Click me</Button>)
+    expect(screen.getByRole("button", { name: /click me/i })).toBeInTheDocument()
+  })
+
+  it("handles click events", async () => {
+    const user = userEvent.setup()
+    const handleClick = vi.fn()
+
+    render(<Button onClick={handleClick}>Click me</Button>)
+
+    await user.click(screen.getByRole("button"))
+    expect(handleClick).toHaveBeenCalledTimes(1)
+  })
+})
+```
+
+### 测试指南
+
+- 测试行为，而不是实现
+- 每个测试尽可能一个断言
+- 清晰的测试名称描述场景
+- 使用现有的测试工具/助手
+- 测试应该是确定性的
+
+## 决策框架
+
+当存在多个有效方法时，基于以下选择：
+
+1. **可测试性** - 我能轻松测试这个吗？
+2. **可读性** - 6个月后有人能理解这个吗？
+3. **一致性** - 这匹配项目模式吗？
+4. **简单性** - 这是最简单的解决方案吗？
+5. **可逆性** - 以后改变有多难？
+
+## 项目集成
+
+### 学习代码库
+
+- 找到3个类似功能/组件
+- 识别常见模式和约定
+- 尽可能使用相同的库/工具
+- 遵循现有的测试模式
+
+### 工具
+
+- 使用项目的现有构建系统
+- 使用项目的测试框架
+- 使用项目的格式化工具/检查器设置
+- 没有强烈理由不要引入新工具
+
+## 质量门控
+
+### 完成定义
+
+- [ ] 测试编写并通过
+- [ ] 代码遵循项目约定
+- [ ] 没有检查器/格式化警告
+- [ ] 提交消息清晰
+- [ ] 实现匹配计划
+- [ ] 没有无问题号的TODO
+
+## 重要提醒
+
+**永远不要**：
+- 使用 `--no-verify` 绕过提交钩子
+- 禁用测试而不是修复它们
+- 提交不编译的代码
+- 做假设 - 用现有代码验证
+
+**总是**：
+- 增量提交工作代码
+- 更新计划文档
+- 从现有实现学习
+- 3次失败尝试后停止并重新评估
+
+## 核心技术要求
+
+1. **动态渲染优先**：所有 UI 都通过 JSON 协议动态生成，不写死组件
+2. **数据库驱动**：界面配置存储在数据库，支持版本控制和回滚
+3. **AI 集成**：支持自然语言描述生成界面，实时优化布局
+4. **性能优化**：协议解析缓存，组件懒加载，虚拟化长列表
+5. **类型安全**：所有协议都有完整的 TypeScript 类型定义
+
+## 开发重点
+
+- 使用 shadcn/ui 的编码风格但专注于动态渲染
+- 协议优先设计，组件是协议的执行器
+- 数据库存储 JSON 协议，支持实时更新
+- AI 驱动的界面生成和优化
+- 遵循 OriginUI 的设计系统和组件规范
+
+---
+
+**重要提示**:
+1. 始终遵循 shadcn-ui 的设计原则和代码风格，但专注于动态渲染
+2. 使用最新版本的所有技术栈（React 19, Tailwind v4 等）
+3. 优先考虑协议的可扩展性和组件的动态性
+4. 确保所有协议都有完整的 TypeScript 类型定义
+5. 遵循无障碍访问标准（使用 Radix UI 原语）
+6. 当有疑问时，参考 shadcn-ui 的编码风格但适应动态渲染需求
+7. **核心原则**：数据库存储协议，动态渲染界面，AI 驱动交互
+
+- Learn from existing implementations
+- Stop after 3 failed attempts and reassess
