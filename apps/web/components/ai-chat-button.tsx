@@ -25,10 +25,10 @@ export function AIChatButton({ onClick, isOpen = false }: AIChatButtonProps) {
               onMouseLeave={() => setIsHovered(false)}
               className={cn(
                 "h-14 w-14 rounded-full shadow-lg transition-all duration-300 ease-in-out",
-                "bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700",
+                "bg-primary hover:bg-primary/90",
                 "hover:scale-110 hover:shadow-xl",
-                "focus:outline-none focus:ring-4 focus:ring-blue-300",
-                isOpen && "bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700"
+                "focus:outline-none focus:ring-4 focus:ring-ring",
+                isOpen && "bg-muted hover:bg-muted/90"
               )}
               size="icon"
             >
@@ -46,7 +46,7 @@ export function AIChatButton({ onClick, isOpen = false }: AIChatButtonProps) {
 
                 {/* 脉冲动画效果 */}
                 {!isOpen && (
-                  <div className="absolute inset-0 rounded-full bg-blue-400 animate-ping opacity-20"></div>
+                  <div className="absolute inset-0 rounded-full bg-primary animate-ping opacity-20"></div>
                 )}
               </div>
             </Button>
@@ -54,7 +54,7 @@ export function AIChatButton({ onClick, isOpen = false }: AIChatButtonProps) {
             {/* 状态指示器 */}
             {!isOpen && (
               <div className="absolute -top-1 -right-1">
-                <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                <div className="w-3 h-3 bg-success rounded-full animate-pulse"></div>
               </div>
             )}
           </div>

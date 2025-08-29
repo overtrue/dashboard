@@ -9,6 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 import { RiSettingsLine, RiTeamLine, RiLogoutBoxLine } from "@remixicon/react";
 
@@ -52,6 +53,9 @@ export default function UserDropdown() {
             <span>Affiliate area</span>
           </DropdownMenuItem>
         </DropdownMenuGroup>
+        <DropdownMenuSeparator />
+        <DropdownMenuLabel>Theme</DropdownMenuLabel>
+        <ThemeToggle />
         <DropdownMenuSeparator />
         <DropdownMenuItem>
           <RiLogoutBoxLine

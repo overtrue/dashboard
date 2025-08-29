@@ -102,7 +102,7 @@ export function AIChatDialog({ open, onOpenChange }: AIChatDialogProps) {
       <DialogContent className="sm:max-w-[600px] h-[80vh] flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <RiRobot2Line className="h-5 w-5 text-blue-500" />
+            <RiRobot2Line className="h-5 w-5 text-primary" />
             AI 助手
             <Badge variant="secondary" className="ml-auto">
               在线
@@ -120,7 +120,7 @@ export function AIChatDialog({ open, onOpenChange }: AIChatDialogProps) {
               {message.role === "assistant" && (
                 <Avatar className="h-8 w-8">
                   <AvatarImage src="/logo-01.png" alt="AI" />
-                  <AvatarFallback className="bg-blue-100 text-blue-600">
+                  <AvatarFallback className="bg-primary/10 text-primary">
                     <RiRobot2Line className="h-4 w-4" />
                   </AvatarFallback>
                 </Avatar>
@@ -128,8 +128,8 @@ export function AIChatDialog({ open, onOpenChange }: AIChatDialogProps) {
 
               <div
                 className={`max-w-[80%] rounded-lg px-3 py-2 ${message.role === "user"
-                  ? "bg-blue-500 text-white ml-auto"
-                  : "bg-gray-100 text-gray-900"
+                  ? "bg-primary text-primary-foreground ml-auto"
+                  : "bg-muted text-muted-foreground"
                   }`}
               >
                 <p className="text-sm">{message.content}</p>
@@ -141,7 +141,7 @@ export function AIChatDialog({ open, onOpenChange }: AIChatDialogProps) {
               {message.role === "user" && (
                 <Avatar className="h-8 w-8">
                   <AvatarImage src="/user.png" alt="User" />
-                  <AvatarFallback className="bg-gray-100 text-gray-600">
+                  <AvatarFallback className="bg-muted text-muted-foreground">
                     <RiUser3Line className="h-4 w-4" />
                   </AvatarFallback>
                 </Avatar>
@@ -153,15 +153,15 @@ export function AIChatDialog({ open, onOpenChange }: AIChatDialogProps) {
             <div className="flex gap-3 justify-start">
               <Avatar className="h-8 w-8">
                 <AvatarImage src="/logo-01.png" alt="AI" />
-                <AvatarFallback className="bg-blue-100 text-blue-600">
+                <AvatarFallback className="bg-primary/10 text-primary">
                   <RiRobot2Line className="h-4 w-4" />
                 </AvatarFallback>
               </Avatar>
-              <div className="bg-gray-100 rounded-lg px-3 py-2">
+              <div className="bg-muted rounded-lg px-3 py-2">
                 <div className="flex space-x-1">
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0.1s" }}></div>
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
+                  <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce"></div>
+                  <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: "0.1s" }}></div>
+                  <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce" style={{ animationDelay: "0.2s" }}></div>
                 </div>
               </div>
             </div>
@@ -176,7 +176,7 @@ export function AIChatDialog({ open, onOpenChange }: AIChatDialogProps) {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={handleKeyPress}
-            className="min-h-[60px] resize-none"
+            className="min-h-[60px] resize-none bg-background border-border"
             disabled={isLoading}
           />
           <Button

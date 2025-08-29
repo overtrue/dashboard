@@ -764,8 +764,7 @@ function RowActions({
           <DropdownMenuSeparator />
           <DropdownMenuItem
             onClick={() => setShowDeleteDialog(true)}
-            variant="destructive"
-            className="dark:data-[variant=destructive]:focus:bg-destructive/10"
+            className="text-destructive dark:data-[variant=destructive]:focus:bg-destructive/10"
           >
             Delete
           </DropdownMenuItem>

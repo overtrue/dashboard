@@ -17,7 +17,7 @@
 
 - **Frontend**: React 19+, TypeScript 5+, Tailwind CSS v4+, Next.js App Router
 - **UI Library**: OriginUI（基于 shadcn/ui）、Radix UI（最新版）、Framer Motion（最新版）
-- **Backend**: Node.js（最新版）/Express（最新版），PostgreSQL/MySQL（最新版）
+- **Backend**: Node.js（最新版）/AdonisJS（最新版），PostgreSQL/MySQL（最新版）
 - **AI Integration**: Vercel AI SDK（最新版）
 - **Build Tools**: Next.js（最新版）、ESLint、Prettier
 - **Testing**: Vitest、React Testing Library（最新版）

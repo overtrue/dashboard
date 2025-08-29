@@ -1,0 +1,31 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm add:*)",
+      "Bash(pnpm build:*)",
+      "Bash(npm run build)",
+      "Bash(npm run check-types:*)",
+      "Bash(npm run lint)",
+      "Bash(grep:*)",
+      "Bash(find:*)",
+      "Bash(sed:*)",
+      "WebFetch(domain:originui.com)",
+      "WebFetch(domain:ui.shadcn.com)",
+      "Bash(npm install:*)",
+      "Bash(ESLINT_NO_DEV_ERRORS=true npm run build)",
+      "Bash(pnpm dev:*)",
+      "Bash(npm run dev:*)",
+      "Bash(pnpm install:*)",
+      "Bash(pnpm remove:*)",
+      "Bash(lsof:*)",
+      "Bash(kill:*)",
+      "Bash(curl:*)",
+      "Bash(npx:*)",
+      "Bash(pnpm dlx:*)",
+      "Bash(SHADCN_USE_PNPM=true pnpm dlx shadcn@latest add form)",
+      "Bash(pnpm list:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

@@ -4,7 +4,6 @@ export const metadata: Metadata = {
   title: "Experiment 01 - Crafted.is",
 };
 
-import { AIChatContainer } from "@/components/ai-chat-container";
 import { AppSidebar } from "@/components/app-sidebar";
 import ContactsTable from "@/components/contacts-table";
 import FeedbackDialog from "@/components/feedback-dialog";
@@ -154,7 +153,6 @@ export default function Page() {
           </div>
         </div>
       </SidebarInset>
-      <AIChatContainer />
     </SidebarProvider>
   );
 }

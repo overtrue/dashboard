@@ -13,22 +13,10 @@
 ## 技术栈（全部使用最新版）
 - **Frontend**: React 19+, TypeScript 5+, Tailwind CSS v4+, Next.js App Router
 - **UI Library**: OriginUI（基于 shadcn/ui）、Radix UI（最新版）、Framer Motion（最新版）
-- **Backend**: Node.js（最新版）/Express（最新版），PostgreSQL/MySQL（最新版）
+- **Backend**: Node.js（最新版）/AdonisJS（最新版），PostgreSQL/MySQL（最新版）
 - **AI Integration**: OpenAI/Claude API（最新版）
 - **Build Tools**: Next.js（最新版）、ESLint、Prettier
 - **Testing**: Vitest、React Testing Library（最新版）
-
-## 项目结构（参考 Dify 架构）
-```
-dashboard/
-├── frontend/               # 前端应用（Next.js）
-├── backend/                      # 后端 API 服务
-├── docs/                        # 文档
-├── scripts/                     # 构建和部署脚本
-├── docker-compose.yml           # Docker 编排
-├── package.json                 # 根 package.json（工作空间管理）
-└── README.md
-```
 
 ### 架构设计理念（参考 Dify）
 

@@ -1,4 +1,6 @@
 import { Inter } from "next/font/google";
+import { AIChatContainer } from "@/components/ai-chat-container";
+import { ThemeProvider } from "@/components/theme-provider";
 
 import "./globals.css";
 
@@ -13,9 +15,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark scheme-only-dark">
+    <html lang="en" suppressHydrationWarning>
       <body className={`${fontSans.variable} font-sans antialiased`}>
-        {children}
+        <ThemeProvider
+          defaultTheme="system"
+          enableSystem
+        >
+          {children}
+          <AIChatContainer />
+        </ThemeProvider>
       </body>
     </html>
   );
