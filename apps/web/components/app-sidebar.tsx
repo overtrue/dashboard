@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { useState } from "react";
+import Link from "next/link";
 
 import { SearchForm } from "@/components/search-form";
 import { TeamSwitcher } from "@/components/team-switcher";
@@ -223,9 +224,9 @@ export function AppSidebar({ isAdmin = true, ...props }: AppSidebarProps) {
               {item.children?.map((subItem) => (
                 <SidebarMenuSubItem key={subItem.id}>
                   <SidebarMenuSubButton asChild isActive={subItem.isActive}>
-                    <a href={subItem.url || '#'}>
+                    <Link href={subItem.url || '#'}>
                       <span>{subItem.title}</span>
-                    </a>
+                    </Link>
                   </SidebarMenuSubButton>
                 </SidebarMenuSubItem>
               ))}
@@ -243,7 +244,7 @@ export function AppSidebar({ isAdmin = true, ...props }: AppSidebarProps) {
           className="group/menu-button font-medium gap-3 h-9 rounded-md bg-gradient-to-r hover:bg-transparent hover:from-sidebar-accent hover:to-sidebar-accent/40 data-[active=true]:from-primary/20 data-[active=true]:to-primary/5 [&>svg]:size-auto"
           isActive={item.isActive}
         >
-          <a href={item.url || '#'}>
+          <Link href={item.url || '#'}>
             {IconComponent && (
               <IconComponent
                 className="text-muted-foreground/60 group-data-[active=true]/menu-button:text-primary"
@@ -252,7 +253,7 @@ export function AppSidebar({ isAdmin = true, ...props }: AppSidebarProps) {
               />
             )}
             <span>{item.title}</span>
-          </a>
+          </Link>
         </SidebarMenuButton>
       </SidebarMenuItem>
     );
