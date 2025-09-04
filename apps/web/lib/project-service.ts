@@ -1,4 +1,4 @@
-import { ProjectProtocol, ProjectFormData, ProjectStats, ProjectService } from '@/types/project'
+import { ProjectFormData, ProjectProtocol, ProjectService, ProjectStats } from '@/types/project'
 
 // 模拟业务隔离项目数据存储
 const projectStorage: ProjectProtocol[] = [
@@ -44,7 +44,7 @@ export class ProjectServiceImpl implements ProjectService {
   async getProjects(): Promise<ProjectProtocol[]> {
     // 模拟异步操作
     await new Promise(resolve => setTimeout(resolve, 300))
-    return [...projectStorage].sort((a, b) => 
+    return [...projectStorage].sort((a, b) =>
       new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
     )
   }
@@ -57,50 +57,52 @@ export class ProjectServiceImpl implements ProjectService {
 
   async createProject(data: ProjectFormData): Promise<ProjectProtocol> {
     await new Promise(resolve => setTimeout(resolve, 400))
-    
+
     const newProject: ProjectProtocol = {
       id: Date.now().toString(),
       ...data,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     }
-    
+
     projectStorage.push(newProject)
     return { ...newProject }
   }
 
   async updateProject(id: string, data: Partial<ProjectFormData>): Promise<ProjectProtocol> {
     await new Promise(resolve => setTimeout(resolve, 350))
-    
+
     const index = projectStorage.findIndex(p => p.id === id)
     if (index === -1) {
       throw new Error('Project not found')
     }
-    
+
+    // 直接使用 data，因为 ProjectFormData 中没有 id 字段
+
     const updatedProject = {
       ...projectStorage[index],
       ...data,
       updatedAt: new Date().toISOString(),
-    }
-    
+    } as ProjectProtocol
+
     projectStorage[index] = updatedProject
     return { ...updatedProject }
   }
 
   async deleteProject(id: string): Promise<void> {
     await new Promise(resolve => setTimeout(resolve, 300))
-    
+
     const index = projectStorage.findIndex(p => p.id === id)
     if (index === -1) {
       throw new Error('Project not found')
     }
-    
+
     projectStorage.splice(index, 1)
   }
 
   async getProjectStats(): Promise<ProjectStats> {
     await new Promise(resolve => setTimeout(resolve, 200))
-    
+
     const projects = await this.getProjects()
     const stats = {
       total: projects.length,

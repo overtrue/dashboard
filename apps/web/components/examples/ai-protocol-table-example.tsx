@@ -1,18 +1,18 @@
 "use client";
 
-import { useMemo } from "react";
-import { UnifiedTable } from "@/components/ui/unified-table";
-import type { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { 
-  RiRobot2Line, 
-  RiMore2Line, 
-  RiPlayLine, 
-  RiSettingsLine,
-  RiStopCircleLine 
+import { UnifiedTable } from "@/components/ui/unified-table";
+import {
+    RiMore2Line,
+    RiPlayLine,
+    RiRobot2Line,
+    RiSettingsLine,
+    RiStopCircleLine
 } from "@remixicon/react";
+import type { ColumnDef } from "@tanstack/react-table";
+import { useMemo } from "react";
 
 // Example AI Protocol interface
 interface AIProtocol {
@@ -108,7 +108,7 @@ export function AIProtocolTable({ protocols, onRun, onConfigure, onPause }: AIPr
           error: "bg-red-500",
           training: "bg-yellow-500",
         };
-        
+
         return (
           <Badge className={variants[status]}>
             {status.charAt(0).toUpperCase() + status.slice(1)}
@@ -123,8 +123,8 @@ export function AIProtocolTable({ protocols, onRun, onConfigure, onPause }: AIPr
       cell: ({ row }) => (
         <div className="flex items-center gap-2">
           <div className="w-16 bg-gray-200 rounded-full h-2">
-            <div 
-              className="bg-blue-500 h-2 rounded-full" 
+            <div
+              className="bg-blue-500 h-2 rounded-full"
               style={{ width: `${row.original.accuracy}%` }}
             />
           </div>
@@ -216,9 +216,14 @@ export function AIProtocolTable({ protocols, onRun, onConfigure, onPause }: AIPr
     <UnifiedTable
       data={protocols}
       columns={columns}
-      searchKey="name"
-      searchPlaceholder="Search AI protocols..."
-      pageSize={20}
+      searchable={true}
+      filterable={true}
+      sortable={true}
+      pagination={{ pageSize: 20 }}
+      emptyState={{
+        title: "No AI protocols found",
+        description: "Create your first AI protocol to get started"
+      }}
     />
   );
 }

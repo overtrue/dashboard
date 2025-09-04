@@ -1,29 +1,28 @@
 'use client'
 
-import * as React from 'react'
 import { User } from '@/types/user'
 import { ColumnDef } from '@tanstack/react-table'
 
-import { UnifiedTable } from '@/components/ui/unified-table'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger,
-  DropdownMenuSeparator
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
+import { UnifiedTable } from '@/components/ui/unified-table'
 import { cn } from '@/lib/utils'
 
 import {
-  RiMore2Line,
-  RiEditLine,
-  RiDeleteBinLine,
-  RiUserLine,
-  RiAtLine,
-  RiShieldUserLine,
-  RiUserFollowLine
+    RiAtLine,
+    RiDeleteBinLine,
+    RiEditLine,
+    RiMore2Line,
+    RiShieldUserLine,
+    RiUserFollowLine,
+    RiUserLine
 } from '@remixicon/react'
 
 interface UsersTableProps {
@@ -34,14 +33,14 @@ interface UsersTableProps {
   onRefresh?: () => void
 }
 
-export function UsersTable({ 
-  data, 
-  loading = false, 
+export function UsersTable({
+  data,
+  loading = false,
   onEdit,
   onDelete,
-  onRefresh 
+  onRefresh
 }: UsersTableProps) {
-  
+
   const columns: ColumnDef<User>[] = [
     {
       id: 'user',
@@ -79,7 +78,7 @@ export function UsersTable({
       header: '角色',
       cell: ({ row }) => {
         const role = row.getValue('role') as 'admin' | 'user'
-        
+
         const roleConfig = {
           admin: {
             label: '管理员',
@@ -90,9 +89,9 @@ export function UsersTable({
             className: 'gap-1 py-0.5 px-2 text-sm text-blue-700 border-blue-300 bg-blue-50 dark:text-blue-300 dark:border-blue-700 dark:bg-blue-950/30'
           }
         }
-        
+
         const config = roleConfig[role]
-        
+
         return (
           <Badge variant="outline" className={cn(config.className)}>
             {role === 'admin' ? (
@@ -116,9 +115,9 @@ export function UsersTable({
           <div className="text-sm">
             <div>{date.toLocaleDateString('zh-CN')}</div>
             <div className="text-xs text-muted-foreground">
-              {date.toLocaleTimeString('zh-CN', { 
-                hour: '2-digit', 
-                minute: '2-digit' 
+              {date.toLocaleTimeString('zh-CN', {
+                hour: '2-digit',
+                minute: '2-digit'
               })}
             </div>
           </div>
@@ -136,9 +135,9 @@ export function UsersTable({
           <div className="text-sm">
             <div>{date.toLocaleDateString('zh-CN')}</div>
             <div className="text-xs text-muted-foreground">
-              {date.toLocaleTimeString('zh-CN', { 
-                hour: '2-digit', 
-                minute: '2-digit' 
+              {date.toLocaleTimeString('zh-CN', {
+                hour: '2-digit',
+                minute: '2-digit'
               })}
             </div>
           </div>
@@ -151,7 +150,7 @@ export function UsersTable({
       cell: ({ row }) => {
         const user = row.original
         const isDefaultAdmin = user.id === 'admin-1' && user.role === 'admin'
-        
+
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -168,8 +167,8 @@ export function UsersTable({
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 className={cn(
-                  isDefaultAdmin 
-                    ? "text-muted-foreground cursor-not-allowed opacity-50" 
+                  isDefaultAdmin
+                    ? "text-muted-foreground cursor-not-allowed opacity-50"
                     : "text-red-600"
                 )}
                 onClick={() => !isDefaultAdmin && onDelete?.(user)}
@@ -190,9 +189,14 @@ export function UsersTable({
       data={data}
       columns={columns}
       loading={loading}
-      searchPlaceholder="搜索用户邮箱..."
-      emptyMessage="暂无用户数据"
-      onRefresh={onRefresh}
+      searchable={true}
+      filterable={true}
+      sortable={true}
+      pagination={true}
+      emptyState={{
+        title: "暂无用户数据",
+        description: "创建您的第一个用户开始使用"
+      }}
     />
   )
 }

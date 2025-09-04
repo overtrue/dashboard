@@ -1,30 +1,29 @@
 'use client'
 
-import * as React from 'react'
 import type { DataSourceProtocol, DataSourceType } from '@/types/datasource'
 import { dataSourceTypeLabels } from '@/types/datasource'
 import { ColumnDef } from '@tanstack/react-table'
 
-import { UnifiedTable } from '@/components/ui/unified-table'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger 
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
+import { UnifiedTable } from '@/components/ui/unified-table'
 
 import {
-  RiDatabase2Line,
-  RiMore2Line,
-  RiEditLine,
-  RiDeleteBinLine,
-  RiRefreshLine,
-  RiCheckLine,
-  RiCloseLine,
-  RiTimeLine,
-  RiFlagLine
+    RiCheckLine,
+    RiCloseLine,
+    RiDatabase2Line,
+    RiDeleteBinLine,
+    RiEditLine,
+    RiFlagLine,
+    RiMore2Line,
+    RiRefreshLine,
+    RiTimeLine
 } from '@remixicon/react'
 
 interface DataSourcesTableProps {
@@ -41,7 +40,7 @@ const formatLastTested = (date: Date | undefined): string => {
   const now = new Date()
   const diff = now.getTime() - date.getTime()
   const days = Math.floor(diff / (1000 * 60 * 60 * 24))
-  
+
   if (days === 0) return 'Today'
   if (days === 1) return 'Yesterday'
   if (days < 7) return `${days} days ago`
@@ -109,15 +108,10 @@ const createColumns = (onEdit?: (dataSource: DataSourceProtocol) => void, onTest
     cell: ({ row }) => {
       const dataSource = row.original
       return (
-        <div className="flex items-center gap-3">
-          <div className="h-8 w-8 rounded-md bg-gradient-to-br from-sidebar/60 to-sidebar flex items-center justify-center">
-            <RiDatabase2Line className="h-4 w-4 text-muted-foreground" />
-          </div>
-          <div>
-            <div className="font-medium">{dataSource.name}</div>
-            <div className="text-sm text-muted-foreground">
-              {dataSource.description || 'No description'}
-            </div>
+        <div>
+          <div className="font-medium">{dataSource.name}</div>
+          <div className="text-sm text-muted-foreground">
+            {dataSource.description || 'No description'}
           </div>
         </div>
       )
@@ -210,7 +204,7 @@ const createColumns = (onEdit?: (dataSource: DataSourceProtocol) => void, onTest
     header: 'Actions',
     cell: ({ row }) => {
       const dataSource = row.original
-      
+
       return (
         <div className="text-right">
           <DropdownMenu>
@@ -229,7 +223,7 @@ const createColumns = (onEdit?: (dataSource: DataSourceProtocol) => void, onTest
                 <RiEditLine className="mr-2 h-4 w-4" />
                 Edit
               </DropdownMenuItem>
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 onClick={() => onDelete?.(dataSource)}
                 className="text-destructive focus:text-destructive"
               >

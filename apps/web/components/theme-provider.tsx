@@ -38,7 +38,7 @@ export function ThemeProvider({
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    
+
     const root = window.document.documentElement;
     root.classList.remove("light", "dark");
 
@@ -56,12 +56,12 @@ export function ThemeProvider({
   const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">("dark");
 
   useEffect(() => {
-    const newResolvedTheme =
+    const newResolvedTheme: "light" | "dark" =
       theme === "system" && enableSystem
         ? window.matchMedia("(prefers-color-scheme: dark)").matches
           ? "dark"
           : "light"
-        : theme;
+        : (theme === "system" ? "dark" : theme);
     setResolvedTheme(newResolvedTheme);
   }, [theme, enableSystem]);
 

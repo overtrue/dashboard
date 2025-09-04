@@ -1,30 +1,29 @@
 'use client'
 
-import * as React from 'react'
 import { ProjectProtocol } from '@/types/project'
 import { ColumnDef } from '@tanstack/react-table'
 
-import { UnifiedTable } from '@/components/ui/unified-table'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger,
-  DropdownMenuSeparator
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
+import { UnifiedTable } from '@/components/ui/unified-table'
 import { cn } from '@/lib/utils'
 
 import {
-  RiMore2Line,
-  RiEditLine,
-  RiDeleteBinLine,
-  RiEyeLine,
-  RiFolderLine,
-  RiUserLine,
-  RiDatabase2Line,
-  RiCheckLine
+    RiCheckLine,
+    RiDatabase2Line,
+    RiDeleteBinLine,
+    RiEditLine,
+    RiEyeLine,
+    RiFolderLine,
+    RiMore2Line,
+    RiUserLine
 } from '@remixicon/react'
 
 interface ProjectsTableProps {
@@ -36,15 +35,15 @@ interface ProjectsTableProps {
   onRefresh?: () => void
 }
 
-export function ProjectsTable({ 
-  data, 
-  loading = false, 
+export function ProjectsTable({
+  data,
+  loading = false,
   onView,
   onEdit,
   onDelete,
-  onRefresh 
+  onRefresh
 }: ProjectsTableProps) {
-  
+
   const columns: ColumnDef<ProjectProtocol>[] = [
     {
       id: 'name',
@@ -78,7 +77,7 @@ export function ProjectsTable({
       cell: ({ row }) => {
         const environment = row.getValue('environment') as 'development' | 'staging' | 'production'
         if (!environment) return <span className="text-muted-foreground">-</span>
-        
+
         const environmentConfig = {
           development: {
             label: '开发',
@@ -93,9 +92,9 @@ export function ProjectsTable({
             className: 'gap-1 py-0.5 px-2 text-sm text-emerald-700 border-emerald-300 bg-emerald-50 dark:text-emerald-300 dark:border-emerald-700 dark:bg-emerald-950/30'
           }
         }
-        
+
         const config = environmentConfig[environment]
-        
+
         return (
           <Badge variant="outline" className={cn(config.className)}>
             <RiCheckLine className="text-current" size={14} aria-hidden="true" />
@@ -125,7 +124,7 @@ export function ProjectsTable({
       cell: ({ row }) => {
         const owner = row.getValue('owner') as string
         if (!owner) return <span className="text-muted-foreground">-</span>
-        
+
         return (
           <div className="flex items-center gap-2">
             <RiUserLine className="h-4 w-4 text-muted-foreground" />
@@ -141,7 +140,7 @@ export function ProjectsTable({
       cell: ({ row }) => {
         const team = row.getValue('team') as string[] || []
         if (team.length === 0) return <span className="text-muted-foreground">-</span>
-        
+
         return (
           <div className="text-xs">
             <span className="text-muted-foreground">{team.length} 人</span>
@@ -197,9 +196,14 @@ export function ProjectsTable({
       data={data}
       columns={columns}
       loading={loading}
-      searchPlaceholder="搜索项目..."
-      emptyMessage="暂无项目数据"
-      onRefresh={onRefresh}
+      searchable={true}
+      filterable={true}
+      sortable={true}
+      pagination={true}
+      emptyState={{
+        title: "暂无项目数据",
+        description: "创建您的第一个项目开始使用"
+      }}
     />
   )
 }

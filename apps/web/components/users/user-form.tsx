@@ -1,30 +1,29 @@
 'use client'
 
-import React from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import * as z from 'zod'
 import { UserFormData } from '@/types/user'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm } from 'react-hook-form'
+import * as z from 'zod'
 
 import { Button } from '@/components/ui/button'
+import {
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/components/ui/form'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
 } from '@/components/ui/select'
 
-import { RiSaveLine, RiCloseLine } from '@remixicon/react'
+import { RiCloseLine, RiSaveLine } from '@remixicon/react'
 
 // 用户表单验证模式
 const userFormSchema = z.object({
@@ -35,9 +34,7 @@ const userFormSchema = z.object({
   password: z.string()
     .min(6, '密码至少6个字符')
     .max(100, '密码不能超过100个字符'),
-  role: z.enum(['admin', 'user'], {
-    required_error: '请选择用户角色',
-  }),
+  role: z.enum(['admin', 'user']),
 })
 
 // 编辑时密码可选的验证模式
@@ -50,9 +47,7 @@ const userEditSchema = z.object({
     .max(100, '密码不能超过100个字符')
     .optional()
     .or(z.literal('')),
-  role: z.enum(['admin', 'user'], {
-    required_error: '请选择用户角色',
-  }),
+  role: z.enum(['admin', 'user']),
 })
 
 interface UserFormProps {
@@ -68,17 +63,17 @@ const roleOptions = [
   { value: 'user', label: '用户' },
 ]
 
-export function UserForm({ 
-  user, 
-  mode, 
-  onSave, 
-  onCancel, 
-  loading = false 
+export function UserForm({
+  user,
+  mode,
+  onSave,
+  onCancel,
+  loading = false
 }: UserFormProps) {
   const isEditMode = mode === 'edit'
   const schema = isEditMode ? userEditSchema : userFormSchema
-  
-  const form = useForm<UserFormData>({
+
+  const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: {
       email: user?.email || '',
@@ -87,13 +82,13 @@ export function UserForm({
     },
   })
 
-  const handleSubmit = (data: UserFormData) => {
+  const handleSubmit = (data: z.infer<typeof schema>) => {
     // 编辑模式下如果密码为空，则不更新密码
     if (isEditMode && !data.password) {
       const { password, ...dataWithoutPassword } = data
       onSave(dataWithoutPassword as UserFormData)
     } else {
-      onSave(data)
+      onSave(data as UserFormData)
     }
   }
 
@@ -108,7 +103,7 @@ export function UserForm({
               <FormItem>
                 <FormLabel>邮箱地址 *</FormLabel>
                 <FormControl>
-                  <Input 
+                  <Input
                     type="email"
                     placeholder="输入邮箱地址"
                     {...field}
@@ -128,7 +123,7 @@ export function UserForm({
                   密码 {isEditMode ? '(留空则不修改)' : '*'}
                 </FormLabel>
                 <FormControl>
-                  <Input 
+                  <Input
                     type="password"
                     placeholder={isEditMode ? '输入新密码（可选）' : '输入密码'}
                     {...field}

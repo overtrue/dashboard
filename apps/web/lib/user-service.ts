@@ -1,4 +1,4 @@
-import { User, UserFormData, UserUpdateData, UserService } from '@/types/user'
+import { User, UserFormData, UserService, UserUpdateData } from '@/types/user'
 
 // 模拟用户数据存储，包含硬编码的管理员账户
 const userStorage: User[] = [
@@ -16,7 +16,7 @@ export class UserServiceImpl implements UserService {
   async getUsers(): Promise<User[]> {
     // 模拟异步操作
     await new Promise(resolve => setTimeout(resolve, 300))
-    return [...userStorage].sort((a, b) => 
+    return [...userStorage].sort((a, b) =>
       new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
     )
   }
@@ -29,63 +29,73 @@ export class UserServiceImpl implements UserService {
 
   async createUser(data: UserFormData): Promise<User> {
     await new Promise(resolve => setTimeout(resolve, 400))
-    
+
     // 检查邮箱是否已存在
     const existingUser = userStorage.find(u => u.email === data.email)
     if (existingUser) {
       throw new Error('Email already exists')
     }
-    
+
     const newUser: User = {
       id: Date.now().toString(),
       ...data,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     }
-    
+
     userStorage.push(newUser)
     return { ...newUser }
   }
 
   async updateUser(id: string, data: UserUpdateData): Promise<User> {
     await new Promise(resolve => setTimeout(resolve, 350))
-    
+
     const index = userStorage.findIndex(u => u.id === id)
     if (index === -1) {
       throw new Error('User not found')
     }
-    
+
+    const currentUser = userStorage[index];
+    if (!currentUser) {
+      throw new Error('User not found')
+    }
+
     // 如果更新邮箱，检查是否已存在
-    if (data.email && data.email !== userStorage[index].email) {
+    if (data.email && data.email !== currentUser.email) {
       const existingUser = userStorage.find(u => u.email === data.email)
       if (existingUser) {
         throw new Error('Email already exists')
       }
     }
-    
+
     const updatedUser = {
-      ...userStorage[index],
+      ...currentUser,
       ...data,
       updatedAt: new Date().toISOString(),
     }
-    
+
     userStorage[index] = updatedUser
     return { ...updatedUser }
   }
 
   async deleteUser(id: string): Promise<void> {
     await new Promise(resolve => setTimeout(resolve, 300))
-    
+
     const index = userStorage.findIndex(u => u.id === id)
     if (index === -1) {
       throw new Error('User not found')
     }
-    
+
+    const userToDelete = userStorage[index];
+    if (!userToDelete) {
+      throw new Error('User not found')
+    }
+
     // 防止删除管理员账户
-    if (userStorage[index].role === 'admin' && userStorage[index].id === 'admin-1') {
+    if (userToDelete.role === 'admin' && userToDelete.id === 'admin-1') {
       throw new Error('Cannot delete default admin user')
     }
-    
+
     userStorage.splice(index, 1)
   }
 }

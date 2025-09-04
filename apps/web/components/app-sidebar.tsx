@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 
 import { SearchForm } from "@/components/search-form";
@@ -36,7 +36,12 @@ import {
   RiSettings3Line,
   RiUserFollowLine,
   RiUserLine,
+  RiPagesLine,
+  RiFileLine,
 } from "@remixicon/react";
+
+// 动态菜单服务
+import { dynamicMenuService, MenuItem, MenuSection } from "@/lib/dynamic-menu-service";
 
 // 图标映射
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -52,24 +57,9 @@ const iconMap: Record<string, React.ComponentType<any>> = {
   RiDatabase2Line,
   RiFolderLine,
   RiUserLine,
+  RiPagesLine,
+  RiFileLine,
 };
-
-// 菜单数据结构
-interface MenuItem {
-  id: string;
-  title: string;
-  url?: string;
-  icon?: string;
-  isActive?: boolean;
-  children?: MenuItem[];
-}
-
-interface MenuSection {
-  id: string;
-  type: 'user_custom' | 'admin_fixed';
-  title: string;
-  items: MenuItem[];
-}
 
 // Teams data
 const teamsData = [
@@ -87,92 +77,6 @@ const teamsData = [
   },
 ];
 
-// 示例菜单数据
-const menuData: MenuSection[] = [
-  {
-    id: 'user_custom',
-    type: 'user_custom',
-    title: 'Sections',
-    items: [
-      {
-        id: 'dashboard',
-        title: 'Dashboard',
-        url: '#',
-        icon: 'RiScanLine',
-        children: [
-          { id: 'overview', title: 'Overview', url: '/dashboard/overview' },
-          { id: 'analytics', title: 'Analytics', url: '/dashboard/analytics' },
-          { id: 'reports', title: 'Reports', url: '/dashboard/reports' },
-        ]
-      },
-      {
-        id: 'insights',
-        title: 'Insights',
-        url: '#',
-        icon: 'RiBardLine',
-        children: [
-          { id: 'trends', title: 'Trends', url: '/insights/trends' },
-          { id: 'predictions', title: 'Predictions', url: '/insights/predictions' },
-        ]
-      },
-      {
-        id: 'contacts',
-        title: 'Contacts',
-        url: '/contacts',
-        icon: 'RiUserFollowLine',
-        isActive: true,
-      },
-      {
-        id: 'tools',
-        title: 'Tools',
-        url: '#',
-        icon: 'RiCodeSSlashLine',
-        children: [
-          { id: 'api', title: 'API Keys', url: '/tools/api' },
-          { id: 'webhooks', title: 'Webhooks', url: '/tools/webhooks' },
-          { id: 'integrations', title: 'Integrations', url: '/tools/integrations' },
-        ]
-      },
-    ]
-  },
-  {
-    id: 'system_admin',
-    type: 'admin_fixed',
-    title: '系统管理',
-    items: [
-      {
-        id: 'data_sources',
-        title: '数据源',
-        url: '/data-sources',
-        icon: 'RiDatabase2Line',
-      },
-      {
-        id: 'projects',
-        title: '项目',
-        url: '/projects',
-        icon: 'RiFolderLine',
-      },
-      {
-        id: 'users',
-        title: '用户管理',
-        url: '/admin/users',
-        icon: 'RiUserLine',
-      },
-      {
-        id: 'settings',
-        title: '系统设置',
-        url: '#',
-        icon: 'RiSettings3Line',
-        children: [
-          { id: 'general', title: '常规设置', url: '/admin/settings/general' },
-          { id: 'security', title: '安全设置', url: '/admin/settings/security' },
-          { id: 'notifications', title: '通知设置', url: '/admin/settings/notifications' },
-        ]
-      }
-    ]
-  }
-];
-
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   userId?: string;
   isAdmin?: boolean;
@@ -180,6 +84,26 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
 
 export function AppSidebar({ isAdmin = true, ...props }: AppSidebarProps) {
   const [openItems, setOpenItems] = useState<Set<string>>(new Set(['dashboard', 'settings']));
+  const [menuData, setMenuData] = useState<MenuSection[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // 加载动态菜单数据
+  useEffect(() => {
+    const loadMenuData = async () => {
+      try {
+        const data = await dynamicMenuService.getMenuData();
+        setMenuData(data);
+      } catch (error) {
+        console.error('Error loading menu data:', error);
+        // 如果加载失败，使用空数据但保持基本结构
+        setMenuData([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadMenuData();
+  }, []);
 
   const toggleItem = (itemId: string) => {
     const newOpenItems = new Set(openItems);
@@ -289,16 +213,37 @@ export function AppSidebar({ isAdmin = true, ...props }: AppSidebarProps) {
         <SearchForm className="mt-3" />
       </SidebarHeader>
       <SidebarContent>
-        {/* 用户自定义菜单区域 */}
-        {userSections.map(renderMenuSection)}
+        {loading ? (
+          // 加载状态
+          <div className="px-4 py-6">
+            <div className="space-y-4">
+              <div className="h-4 bg-muted rounded animate-pulse" />
+              <div className="space-y-2">
+                <div className="h-8 bg-muted rounded animate-pulse" />
+                <div className="h-8 bg-muted rounded animate-pulse" />
+                <div className="h-8 bg-muted rounded animate-pulse" />
+              </div>
+              <div className="h-4 bg-muted rounded animate-pulse mt-6" />
+              <div className="space-y-2">
+                <div className="h-8 bg-muted rounded animate-pulse" />
+                <div className="h-8 bg-muted rounded animate-pulse" />
+              </div>
+            </div>
+          </div>
+        ) : (
+          <>
+            {/* 用户自定义菜单区域 */}
+            {userSections.map(renderMenuSection)}
 
-        {/* 分隔线 */}
-        {userSections.length > 0 && isAdmin && adminSections.length > 0 && (
-          <hr className="border-t border-border mx-4 my-2" />
+            {/* 分隔线 */}
+            {userSections.length > 0 && isAdmin && adminSections.length > 0 && (
+              <hr className="border-t border-border mx-4 my-2" />
+            )}
+
+            {/* 管理员固定菜单区域 */}
+            {adminSections.map(renderMenuSection)}
+          </>
         )}
-
-        {/* 管理员固定菜单区域 */}
-        {adminSections.map(renderMenuSection)}
       </SidebarContent>
       <SidebarFooter>
         <hr className="border-t border-border mx-2 -mt-px" />

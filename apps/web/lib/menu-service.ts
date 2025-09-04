@@ -67,7 +67,7 @@ export class MenuService {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
-    
+
     menuStorage.push(newItem);
     return newItem;
   }
@@ -77,12 +77,26 @@ export class MenuService {
     const index = menuStorage.findIndex(item => item.id === id);
     if (index === -1) return null;
 
+    // 创建更新对象，排除 id 字段和 undefined 值
+    const updateData: Partial<Omit<MenuItem, 'id'>> = {};
+
+    if (data.title !== undefined) updateData.title = data.title;
+    if (data.url !== undefined) updateData.url = data.url;
+    if (data.icon !== undefined) updateData.icon = data.icon;
+    if (data.isActive !== undefined) updateData.isActive = data.isActive;
+    if (data.isVisible !== undefined) updateData.isVisible = data.isVisible;
+    if (data.orderIndex !== undefined) updateData.orderIndex = data.orderIndex;
+    if (data.parentId !== undefined) updateData.parentId = data.parentId;
+    if (data.userId !== undefined) updateData.userId = data.userId;
+    if (data.children !== undefined) updateData.children = data.children;
+    if (data.createdAt !== undefined) updateData.createdAt = data.createdAt;
+
     menuStorage[index] = {
       ...menuStorage[index],
-      ...data,
+      ...updateData,
       updatedAt: new Date().toISOString(),
-    };
-    
+    } as MenuItem;
+
     return menuStorage[index];
   }
 
@@ -103,8 +117,11 @@ export class MenuService {
     updates.forEach(update => {
       const index = menuStorage.findIndex(item => item.id === update.id);
       if (index !== -1) {
-        menuStorage[index].orderIndex = update.orderIndex;
-        menuStorage[index].updatedAt = new Date().toISOString();
+        const menuItem = menuStorage[index];
+        if (menuItem) {
+          menuItem.orderIndex = update.orderIndex;
+          menuItem.updatedAt = new Date().toISOString();
+        }
       }
     });
     return true;
@@ -112,7 +129,7 @@ export class MenuService {
 
   // 构建层次结构
   static buildMenuHierarchy(items: MenuItem[]): MenuItem[] {
-    const itemMap = new Map(items.map(item => [item.id, { ...item, children: [] }]));
+    const itemMap = new Map(items.map(item => [item.id, { ...item, children: [] as MenuItem[] }]));
     const roots: MenuItem[] = [];
 
     items.forEach(item => {
@@ -144,7 +161,7 @@ export class MenuService {
   static async organizeUserMenus(userId: string): Promise<MenuSection[]> {
     const userMenus = await this.getUserMenus(userId);
     const hierarchicalMenus = this.buildMenuHierarchy(userMenus);
-    
+
     // 将顶级项目作为分组，其子项作为菜单项
     const sections: MenuSection[] = hierarchicalMenus
       .filter(item => !item.parentId)
@@ -163,7 +180,7 @@ export class MenuService {
   // 获取完整侧边栏配置
   static async getSidebarConfig(userId: string, isAdmin: boolean = false): Promise<SidebarConfig> {
     const userSections = await this.organizeUserMenus(userId);
-    
+
     return {
       userSections,
       adminSections: isAdmin ? ADMIN_FIXED_SECTIONS : []
