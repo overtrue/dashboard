@@ -1,0 +1,23 @@
+# dependencies
+node_modules/
+
+# Next.js build output
+.next/
+out/
+tsconfig.tsbuildinfo
+
+# database file
+*.db
+*.db-wal
+*.db-shm
+
+# environment
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+
+# logs
+*.log

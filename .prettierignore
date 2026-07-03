@@ -1,0 +1,7 @@
+.next
+node_modules
+tsconfig.tsbuildinfo
+pnpm-lock.yaml
+example.db
+example.db-shm
+example.db-wal
