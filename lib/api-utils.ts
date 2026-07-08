@@ -2,9 +2,47 @@ import { NextResponse } from "next/server"
 
 import { DashboardError } from "@/lib/errors"
 
+/**
+ * refine-sqlx errors carry a stable `code` (e.g. RECORD_NOT_FOUND / TABLE_NOT_FOUND).
+ * A request for a record that does not exist is not a server-side failure, so map
+ * these to the appropriate 4xx status instead of surfacing them as 500 Internal
+ * server error to the client.
+ */
+const REFINE_SQL_ERROR_STATUS: Record<string, number> = {
+  RECORD_NOT_FOUND: 404,
+  TABLE_NOT_FOUND: 404,
+  COLUMN_NOT_FOUND: 400,
+  UNSUPPORTED_OPERATOR: 400,
+  INVALID_FIELD_VALUE: 400,
+  MISSING_REQUIRED_FIELD: 400,
+  ID_TYPE_CONVERSION_ERROR: 400,
+  ACCESS_DENIED: 403,
+  OPTIMISTIC_LOCK_ERROR: 409,
+  FEATURE_NOT_ENABLED: 501,
+}
+
+function mapRefineSqlErrorStatus(error: unknown): number | null {
+  if (!(error instanceof Error)) {
+    return null
+  }
+
+  const code = (error as { code?: unknown }).code
+  if (typeof code !== "string") {
+    return null
+  }
+
+  return REFINE_SQL_ERROR_STATUS[code] ?? null
+}
+
 export function toErrorResponse(error: unknown) {
   if (error instanceof DashboardError) {
     return NextResponse.json({ message: error.message }, { status: error.statusCode })
+  }
+
+  const refineSqlStatus = mapRefineSqlErrorStatus(error)
+  if (refineSqlStatus !== null) {
+    const message = error instanceof Error ? error.message : String(error)
+    return NextResponse.json({ message }, { status: refineSqlStatus })
   }
 
   console.error("[api] unexpected error:", formatErrorChain(error))
